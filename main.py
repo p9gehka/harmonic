@@ -12,7 +12,7 @@ class Thread(QtCore.QThread):
         QtCore.QThread.__init__(self, parent)
         self.cb = cb
     def run(self):
-        self.cb()
+        self.cb(self)
 
 class MainWindow(QtGui.QWidget):
     def __init__(self, parent = None):
@@ -20,7 +20,7 @@ class MainWindow(QtGui.QWidget):
 
         self.controllersData = ControllersData()
 
-        self.graphView = Graphic()
+        self.graphView = Graphic(400, 400)
         self.buttons = Buttons(self.circleSync, self.countSync, self.globalSync)
         self.buttons.setGlobalValue(0, True, 100)
 
@@ -30,7 +30,7 @@ class MainWindow(QtGui.QWidget):
         self.setLayout(self.vbox)
 
         self.cycle = Thread(self.drawCicle);
-        self.connect(self.cycle, QtCore.SIGNAL('draw(QVariant)'), self.graphView.drawValue, QtCore.Qt.QueuedConnection)
+        self.connect(self.cycle, QtCore.SIGNAL('draw(QVariant)'), self.on_valueChanged, QtCore.Qt.QueuedConnection)
 
     def circleSync(self, index, radius, frequency, phase):
         self.controllersData.setData(index, radius, frequency, phase)
@@ -42,16 +42,17 @@ class MainWindow(QtGui.QWidget):
         data = self.controllersData.getDataIndex(index)
         self.buttons.setCircleData(data[0], data[1], data[2])
 
-    def drawCicle(self):
+    def drawCicle(self, thread):
         theta = 0
         F = 0.3
         rate = 1 / 60
         while True:
             theta += rate + F;
             circlesList = self.controllersData.getCirclesList()
-            self.emit(QtCore.SIGNAL('draw(QVariant)'), circlesList)
+            thread.emit(QtCore.SIGNAL('draw(QVariant)'), circlesList)
             time.sleep(0.03)
-
+    def on_valueChanged(self, valuesList):
+        self.graphView.drawValue(valuesList)
     def runAnimation(self):
         self.cycle.start()
 

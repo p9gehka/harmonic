@@ -10,6 +10,7 @@ class Buttons(QtGui.QWidget):
 
     self.circlePlus = QtGui.QPushButton('+')
     self.circleMinus = QtGui.QPushButton('-')
+    self.resetView = QtGui.QPushButton('reset view')
     self.circleSelect = QtGui.QComboBox()
     self.showCheckbox = QtGui.QCheckBox()
     self.radiusLine = QtGui.QLineEdit()
@@ -22,6 +23,7 @@ class Buttons(QtGui.QWidget):
     #add widget
     self.hbox.addWidget(self.circlePlus)
     self.hbox.addWidget(self.circleMinus)
+    self.hbox.addWidget(self.resetView)
     self.hbox.addWidget(self.circleSelect)
     self.hbox.addWidget(self.showCheckbox)
     self.hbox.addWidget(self.radiusLine)
@@ -32,6 +34,7 @@ class Buttons(QtGui.QWidget):
     #events
     self.connect(self.circlePlus, QtCore.SIGNAL('clicked()'), self.on_circlePlus)
     self.connect(self.circleMinus, QtCore.SIGNAL('clicked()'), self.on_circleMinus)
+    self.connect(self.resetView, QtCore.SIGNAL('clicked()'), self.on_resetView)
     self.connect(self.circleSelect, QtCore.SIGNAL('currentIndexChanged(int)'), self.on_circleSelectChanged)
     self.connect(self.showCheckbox, QtCore.SIGNAL('toggled(bool)'), self.on_showCheckboxChanged)
     self.connect(self.radiusLine, QtCore.SIGNAL('textChanged(const QString&)'), self.on_radiusLineChanged)
@@ -96,4 +99,7 @@ class Buttons(QtGui.QWidget):
   def on_showCheckboxChanged(self, b):
       self.globalValueChanged()
   def on_animationSpeedSlowLineChanged(self, string):
+      self.globalValueChanged()
+  def on_resetView(self):
+      print('reset')
       self.globalValueChanged()
