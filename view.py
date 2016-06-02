@@ -9,37 +9,32 @@ class Graphic(QtGui.QGraphicsView):
     self.graphScene = QtGui.QGraphicsScene()
     self.graphScene.addLine(self.line)
     self.setScene(self.graphScene)
+
     self.textList = []
-  def drawValue(self, circlesList):
-      cl = len(circlesList)
-      dtl = self.textList[cl:]
-      self.textList = self.textList[0:cl]
-      tl = len(self.textList)
-      for i in range(cl):
-        print(i, cl, len(self.textList))
-        circle = circlesList[i]
-        values = 'f{0} r{1} p{2}'.format(circle.frequency, circle.radius, circle.phase)
-        if(i >= tl):
-            t = self.graphScene.addSimpleText(values)
-            t.setY(i * 10)
-            self.textList.append(t)
-        else:
-            print (i, cl, len(self.textList))
-            self.textList[i].setText(values)
+    self.circlesList = []
+
+  def drawValue(self, newCirclesList):
+      ncl = len(newCirclesList)
+      dtl = self.textList[ncl:]
+      self.textList = self.textList[0:ncl]
+      self.drawText(newCirclesList, self.textList)
+      self.drawCircles(newCirclesList, self.circlesList)
 
       #removing
       self.removeItems(dtl)
 
-  # circlesList, self.textList
+  def drawCircles(self, newList, oldList):
+
+  # newCirclesList, self.textList
   def drawText(self, newList, oldList):
     nl = len(newList)
     ol = len(oldList)
     for i in range(nl):
       circle = newList[i]
       values = '{0} r{1} p{2}'.format(circle.frequency, circle.radius, circle.phase)
-      if(i > ol):
+      if(i >= ol):
         t = self.graphScene.addSimpleText(values)
-        t.setY(i + 15)
+        t.setY(i * 15)
         oldList.append(t)
       else:
         oldList[i].setText(values)
