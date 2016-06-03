@@ -2,10 +2,14 @@ from PyQt4 import QtGui, QtCore
 from view import Graphic
 from controllers import Buttons
 from controllersDataService import ControllersData
+from furieService import MathLogic
 
 import AppConfig
 import sys
 import time
+import math
+
+PI = math.pi
 
 class Thread(QtCore.QThread):
     def __init__(self, cb, parent = None):
@@ -45,12 +49,13 @@ class MainWindow(QtGui.QWidget):
     def drawCicle(self, thread):
         theta = 0
         F = 0.3
-        rate = 1 / 60
+        rate = 1 / 60;
         while True:
-            theta += rate + F;
+            theta = 1
             circlesList = self.controllersData.getCirclesList()
-            thread.emit(QtCore.SIGNAL('draw(QVariant)'), circlesList)
-            time.sleep(0.03)
+            fxList = MathLogic.getCoords(theta, circlesList)
+            thread.emit(QtCore.SIGNAL('draw(QVariant)'), fxList)
+            time.sleep(0.3)
     def on_valueChanged(self, valuesList):
         self.graphView.drawValue(valuesList)
     def runAnimation(self):

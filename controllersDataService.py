@@ -1,14 +1,22 @@
 class Circle():
-  def __init__(self, radius = 1, frequency = 440, phase = 0):
+  def __init__(self, radius = 100, frequency = 2, phase = 0):
     self.radius = radius
     self.frequency = frequency
     self.phase = phase
+
   def setData(self, radius, frequency, phase):
     self.radius = radius
     self.frequency = frequency
     self.phase = phase
+
   def getData(self):
     return self.radius, self.frequency, self.phase
+  def getFRadius(self):
+    return float(self.radius)
+  def getFFrequency(self):
+    return float(self.frequency)
+  def getFPhase(self):
+    return float(self.phase)
 
 class ControllersData():
   def __init__(self):

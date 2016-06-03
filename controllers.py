@@ -55,7 +55,10 @@ class Buttons(QtGui.QWidget):
     #layout
     self.setLayout(self.hbox)
 
-  def circleValueChanged(self):
+  def circleValueChanged(self, correct):
+    if not correct:
+        return
+
     self.circleSync(self.circleSelect.currentIndex(), self.radiusLine.text(), self.frequencyLine.text(), self.phaseLine.text())
   def countValueChanged(self):
       self.countSync(self.circleSelect.count())
@@ -72,11 +75,13 @@ class Buttons(QtGui.QWidget):
 
   #circle change
   def on_radiusLineChanged(self, string):
-      self.circleValueChanged()
+      if(len(string) == 0):
+        return
+      self.circleValueChanged(bool(len(string)))
   def on_frequencyLineChanged(self, string):
-      self.circleValueChanged()
+      self.circleValueChanged(bool(len(string)))
   def on_phaseLineChanged(self, string):
-      self.circleValueChanged()
+      self.circleValueChanged(bool(len(string)))
   def setCircleData(self, radius, frequency, phase = 0):
       self.radiusLine.setText(str(radius))
       self.frequencyLine.setText(str(frequency))
