@@ -37,7 +37,7 @@ class MainWindow(QtGui.QWidget):
 
         self.cycle = Thread(self.drawCicle);
         self.connect(self.cycle, QtCore.SIGNAL('drawCircle(QVariant)'), self.on_drawCircles, QtCore.Qt.QueuedConnection)
-        self.connect(self.cycle, QtCore.SIGNAL('drawGPath(QVariant)'), self.on_drawGPath, QtCore.Qt.QueuedConnection)
+        self.connect(self.cycle, QtCore.SIGNAL('drawGPath(QVariant, QVariant)'), self.on_drawGPath, QtCore.Qt.QueuedConnection)
         self.connect(self.cycle, QtCore.SIGNAL('drawStatic()'), self.on_drawStatic, QtCore.Qt.QueuedConnection)
 
     def circleSync(self, index, radius, frequency, phase):
@@ -65,16 +65,16 @@ class MainWindow(QtGui.QWidget):
             circlesList = self.controllersData.getCirclesList()
             fxList = MathLogic.getCoords(self.theta, circlesList)
             gPath = MathLogic.getGPath(-self.theta, circlesList)
-            gPoint = MathLogic.getGPath(-self.theta, circlesList)
+            gPoint = MathLogic.getGPoint(-self.theta, circlesList)
             thread.emit(QtCore.SIGNAL('drawCircle(QVariant)'), fxList)
-            thread.emit(QtCore.SIGNAL('drawGPath(QVariant)'), gPath)
+            thread.emit(QtCore.SIGNAL('drawGPath(QVariant, QVariant)'), gPath, gPoint)
             thread.emit(QtCore.SIGNAL('drawStatic()'))
             time.sleep(rate)
 
     def on_drawCircles(self, valuesList):
         self.graphView.drawCircles(valuesList)
-    def on_drawGPath(self, gPath):
-        self.graphView.drawGPath(gPath)
+    def on_drawGPath(self, gPath, gPoint):
+        self.graphView.drawGPath(gPath, gPoint)
     def on_drawStatic(self):
         self.graphView.drawStaticObject()
     def runAnimation(self):

@@ -39,7 +39,6 @@ class ControllersData():
   def getCirclesList(self):
     return self.circlesList
   def setCirclesCount(self, count):
-    print(count, len(self.circlesList))
     if(count >= len(self.circlesList)):
       self.circlesList.append(Circle())
     else:

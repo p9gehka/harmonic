@@ -25,6 +25,7 @@ class Graphic(QtGui.QGraphicsView):
     self.axisPen = QtGui.QPen(QtGui.QColor(style.axis))
 
     self.gPathPen = QtGui.QPen(QtGui.QColor(style.gPathLine), style.gPathLineW)
+    self.gLinePen = QtGui.QPen(QtGui.QColor(style.gLine))
     self.pointBrush = QtGui.QBrush(QtGui.QColor(style.pointFill));
     self.pointPen = QtGui.QPen(QtGui.QColor(style.pointOutline))
     self.selectedCircle = self.graphScene.addEllipse(0, 0, 0, 0, pen = self.selectedCirclePen)
@@ -33,6 +34,10 @@ class Graphic(QtGui.QGraphicsView):
     self.xPath = self.graphScene.addLine(-self.margin, 0.0, self.rect().right(), 0.0, pen = self.axisPen)
     self.yPath = self.graphScene.addLine(0.0, -self.rect().height() / 2, 0.0, self.rect().height() / 2, pen = self.axisPen)
     self.graphScene.setSceneRect(-self.margin, -self.rect().height() / 2, self.rect().width(), self.rect().height())
+
+    self.gLine = self.graphScene.addLine(0, 0, 0, 0, pen = self.gLinePen)
+    self.oLine = self.graphScene.addLine(0, 0, 0, 0, pen = self.gLinePen)
+    self.fText = self.graphScene.addSimpleText('');
   def setSelected(self, index):
     self.selected = index
 
@@ -67,7 +72,7 @@ class Graphic(QtGui.QGraphicsView):
     else:
       self.graphScene.setSceneRect(-self.margin, -self.margin, self.rect().width(), self.margin * 2)
       self.yPath.setLine(0.0, -self.margin, 0.0, self.margin * 2)
-  def drawGPath(self, gPath):
+  def drawGPath(self, gPath, gPoint):
     rate = 1000
     gPath.scaleY([0, 2], [0, 1])
     gPath.scaleX([0, 2], [0, 1000])
@@ -82,6 +87,13 @@ class Graphic(QtGui.QGraphicsView):
     self.linesList.append(line)
 
     self.linesList = self.removeLine(self.linesList)
+
+    gPoint.scaleY([0, 2], [0, 1])
+    gPoint.scaleX([0, 2], [0, 1])
+
+    self.gLine.setLine(0, gPoint.y, gPoint.x, gPoint.y)
+    self.oLine.setLine(0, 0, gPoint.x, gPoint.y)
+    self.fText.setText(str(gPoint))
 
   def removeLine(self, lineArr):
     if(len(lineArr) == 0): 

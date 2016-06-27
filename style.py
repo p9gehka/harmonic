@@ -1,10 +1,11 @@
 canvasBg = "#555555"
-pointFill = '#193144'
-pointOutline = '#193144'
+pointFill = '#eeeeee'
+pointOutline = '#a5a5a5'
 pointW = 5
-circleOutline = '#a5a5a5'
+circleOutline = '#89a1A4'
 circleSelectedOutline = '#f59595'
 circleOutlineW = 1
 gPathLine = '#6991A4'
 gPathLineW = 2
 axis = '#69A491'
+gLine = '#a5a5a5'
