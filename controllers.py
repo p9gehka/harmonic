@@ -1,12 +1,13 @@
 from PyQt4 import QtGui, QtCore
 
 class Buttons(QtGui.QWidget):
-  def __init__(self, circleSync, countSync, globalSync, parent = None):
+  def __init__(self, circleSync, countSync, globalSync, reset, parent = None):
     QtGui.QWidget.__init__(self, parent)
 
     self.circleSync = circleSync
     self.countSync = countSync
     self.globalSync = globalSync
+    self.reset = reset
 
     self.circlePlus = QtGui.QPushButton('+')
     self.circleMinus = QtGui.QPushButton('-')
@@ -55,15 +56,30 @@ class Buttons(QtGui.QWidget):
     #layout
     self.setLayout(self.hbox)
 
-  def circleValueChanged(self, correct):
-    if not correct:
-        return
+  def isFieldCorrect(self, value):
+    try:
+        float(value)
+    except ValueError as err:
+        print("error:", err)
+        return False
+    else:
+        return True
+
+  def circleValueChanged(self):
+    if not self.isFieldCorrect(self.radiusLine.text()):
+      return
+    if not self.isFieldCorrect(self.frequencyLine.text()):
+      return
+    if not self.isFieldCorrect(self.phaseLine.text()):
+      return
 
     self.circleSync(self.circleSelect.currentIndex(), self.radiusLine.text(), self.frequencyLine.text(), self.phaseLine.text())
   def countValueChanged(self):
       self.countSync(self.circleSelect.count())
   def globalValueChanged(self):
-      self.globalSync(self.circleSelect.currentIndex(), self.showCheckbox.isChecked, self.animationSpeedSlowLine.text())
+      if not self.isFieldCorrect(self.animationSpeedSlowLine.text()) or int(self.animationSpeedSlowLine.text()) is 0:
+        return
+      self.globalSync(self.circleSelect.currentIndex(), self.showCheckbox.isChecked(), self.animationSpeedSlowLine.text())
   def setGlobalValue(self, index, show, animationSpeedSlow):
     while(self.circleSelect.count() <= index):
       self.circleSelect.addItem(str(self.circleSelect.count()))
@@ -77,11 +93,12 @@ class Buttons(QtGui.QWidget):
   def on_radiusLineChanged(self, string):
       if(len(string) == 0):
         return
-      self.circleValueChanged(bool(len(string)))
+      self.circleValueChanged()
   def on_frequencyLineChanged(self, string):
-      self.circleValueChanged(bool(len(string)))
+      self.circleValueChanged()
   def on_phaseLineChanged(self, string):
-      self.circleValueChanged(bool(len(string)))
+      self.circleValueChanged()
+
   def setCircleData(self, radius, frequency, phase = 0):
       self.radiusLine.setText(str(radius))
       self.frequencyLine.setText(str(frequency))
@@ -105,6 +122,6 @@ class Buttons(QtGui.QWidget):
       self.globalValueChanged()
   def on_animationSpeedSlowLineChanged(self, string):
       self.globalValueChanged()
+  #reset
   def on_resetView(self):
-      print('reset')
-      self.globalValueChanged()
+      self.reset()

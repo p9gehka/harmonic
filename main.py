@@ -7,9 +7,7 @@ from furieService import MathLogic
 import AppConfig
 import sys
 import time
-import math
 
-PI = math.pi
 
 class Thread(QtCore.QThread):
     def __init__(self, cb, parent = None):
@@ -19,22 +17,28 @@ class Thread(QtCore.QThread):
         self.cb(self)
 
 class MainWindow(QtGui.QWidget):
+    theta = 0
+    speedSlow = 1
+    showAnimation = True
+
     def __init__(self, parent = None):
         QtGui.QWidget.__init__(self, parent)
 
         self.controllersData = ControllersData()
 
-        self.graphView = Graphic(400, 400)
-        self.buttons = Buttons(self.circleSync, self.countSync, self.globalSync)
-        self.buttons.setGlobalValue(0, True, 100)
-
         self.vbox = QtGui.QVBoxLayout()
+        self.graphView = Graphic(400, 400, self)
+        self.buttons = Buttons(self.circleSync, self.countSync, self.globalSync, self.reset)
+        self.buttons.setGlobalValue(0, True, self.speedSlow)
+
         self.vbox.addWidget(self.graphView)
         self.vbox.addWidget(self.buttons)
         self.setLayout(self.vbox)
 
         self.cycle = Thread(self.drawCicle);
-        self.connect(self.cycle, QtCore.SIGNAL('draw(QVariant)'), self.on_valueChanged, QtCore.Qt.QueuedConnection)
+        self.connect(self.cycle, QtCore.SIGNAL('drawCircle(QVariant)'), self.on_drawCircles, QtCore.Qt.QueuedConnection)
+        self.connect(self.cycle, QtCore.SIGNAL('drawGPath(QVariant)'), self.on_drawGPath, QtCore.Qt.QueuedConnection)
+        self.connect(self.cycle, QtCore.SIGNAL('drawStatic()'), self.on_drawStatic, QtCore.Qt.QueuedConnection)
 
     def circleSync(self, index, radius, frequency, phase):
         self.controllersData.setData(index, radius, frequency, phase)
@@ -43,21 +47,36 @@ class MainWindow(QtGui.QWidget):
         self.controllersData.setCirclesCount(count)
 
     def globalSync(self, index, show, speedSlow):
+        self.showAnimation = show;
         data = self.controllersData.getDataIndex(index)
         self.buttons.setCircleData(data[0], data[1], data[2])
+        self.speedSlow = speedSlow
+        self.graphView.setSelected(index)
+
+
+    def reset(self):
+      self.theta = 0
 
     def drawCicle(self, thread):
-        theta = 0
-        F = 0.3
         rate = 1 / 60;
         while True:
-            theta = 1
+            if(self.showAnimation):
+              self.theta += rate / float(self.speedSlow)
             circlesList = self.controllersData.getCirclesList()
-            fxList = MathLogic.getCoords(theta, circlesList)
-            thread.emit(QtCore.SIGNAL('draw(QVariant)'), fxList)
-            time.sleep(0.3)
-    def on_valueChanged(self, valuesList):
-        self.graphView.drawValue(valuesList)
+            fxList = MathLogic.getCoords(self.theta, circlesList)
+            gPath = MathLogic.getGPath(-self.theta, circlesList)
+            gPoint = MathLogic.getGPath(-self.theta, circlesList)
+            thread.emit(QtCore.SIGNAL('drawCircle(QVariant)'), fxList)
+            thread.emit(QtCore.SIGNAL('drawGPath(QVariant)'), gPath)
+            thread.emit(QtCore.SIGNAL('drawStatic()'))
+            time.sleep(rate)
+
+    def on_drawCircles(self, valuesList):
+        self.graphView.drawCircles(valuesList)
+    def on_drawGPath(self, gPath):
+        self.graphView.drawGPath(gPath)
+    def on_drawStatic(self):
+        self.graphView.drawStaticObject()
     def runAnimation(self):
         self.cycle.start()
 

@@ -3,5 +3,8 @@ pointFill = '#193144'
 pointOutline = '#193144'
 pointW = 5
 circleOutline = '#a5a5a5'
+circleSelectedOutline = '#f59595'
 circleOutlineW = 1
-
+gPathLine = '#6991A4'
+gPathLineW = 2
+axis = '#69A491'
