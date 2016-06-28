@@ -20,14 +20,16 @@ class MainWindow(QtGui.QWidget):
     theta = 0
     speedSlow = 1
     showAnimation = True
-
+    cycleRun = True
+    rate = 1 / 60
+    realRate = 1 / 60
     def __init__(self, parent = None):
         QtGui.QWidget.__init__(self, parent)
 
         self.controllersData = ControllersData()
 
         self.vbox = QtGui.QVBoxLayout()
-        self.graphView = Graphic(400, 400, self)
+        self.graphView = Graphic(self)
         self.buttons = Buttons(self.circleSync, self.countSync, self.globalSync, self.reset)
         self.buttons.setGlobalValue(0, True, self.speedSlow)
 
@@ -42,9 +44,11 @@ class MainWindow(QtGui.QWidget):
 
     def circleSync(self, index, radius, frequency, phase):
         self.controllersData.setData(index, radius, frequency, phase)
+        self.graphView.drawFPath(MathLogic.getFPath(self.controllersData.getCirclesList()), self.realRate)
 
     def countSync(self, count):
         self.controllersData.setCirclesCount(count)
+        self.graphView.drawFPath(MathLogic.getFPath(self.controllersData.getCirclesList()), self.realRate)
 
     def globalSync(self, index, show, speedSlow):
         self.showAnimation = show;
@@ -55,13 +59,14 @@ class MainWindow(QtGui.QWidget):
 
 
     def reset(self):
-      self.theta = 0
-
+        self.theta = 0
+        self.graphView.reset()
     def drawCicle(self, thread):
-        rate = 1 / 60;
-        while True:
-            if(self.showAnimation):
-              self.theta += rate / float(self.speedSlow)
+        
+        while self.cycleRun:
+            print(self.cycleRun)
+            self.realRate = self.rate / float(self.speedSlow)
+
             circlesList = self.controllersData.getCirclesList()
             fxList = MathLogic.getCoords(self.theta, circlesList)
             gPath = MathLogic.getGPath(-self.theta, circlesList)
@@ -69,7 +74,9 @@ class MainWindow(QtGui.QWidget):
             thread.emit(QtCore.SIGNAL('drawCircle(QVariant)'), fxList)
             thread.emit(QtCore.SIGNAL('drawGPath(QVariant, QVariant)'), gPath, gPoint)
             thread.emit(QtCore.SIGNAL('drawStatic()'))
-            time.sleep(rate)
+            if(self.showAnimation):
+              self.theta += self.realRate
+            time.sleep(0.5)
 
     def on_drawCircles(self, valuesList):
         self.graphView.drawCircles(valuesList)
@@ -78,6 +85,7 @@ class MainWindow(QtGui.QWidget):
     def on_drawStatic(self):
         self.graphView.drawStaticObject()
     def runAnimation(self):
+        print('runAnimation')
         self.cycle.start()
 
 app = QtGui.QApplication(sys.argv)

@@ -7,14 +7,10 @@ class Graphic(QtGui.QGraphicsView):
   pointsList = []
   circlesList = []
   linesList = []
-  pointPrev = 0;
-  graphPoint = False;
   margin = 0
-  def __init__(self, width, height,window, parent = None):
+  def __init__(self, window, parent = None):
     QtGui.QWidget.__init__(self, parent)
     self.window = window
-    self.W = width
-    self.H = height
     self.graphPoint = QtCore.QPointF(0, 0)
     self.graphScene = QtGui.QGraphicsScene()
     self.setScene(self.graphScene)
@@ -38,9 +34,41 @@ class Graphic(QtGui.QGraphicsView):
     self.gLine = self.graphScene.addLine(0, 0, 0, 0, pen = self.gLinePen)
     self.oLine = self.graphScene.addLine(0, 0, 0, 0, pen = self.gLinePen)
     self.fText = self.graphScene.addSimpleText('');
+  def reset(self):
+    for line in self.linesList:
+      self.graphScene.removeItem(line)
+    self.graphScene.destroyItemGroup(self.lineGroup)
+    self.lineGroup = self.graphScene.createItemGroup([])
+    self.graphPoint = QtCore.QPointF(0, 0)
+    self.linesList = []
+  def drawGPath(self, gPath, gPoint):
+    rate = 1000
+    gPath.scaleY([0, 2], [0, 1])
+    gPath.scaleX([0, 2], [0, 1000])
+    nextPoint = QtCore.QPointF(gPath.x, gPath.y)
+    line = self.graphScene.addLine(QtCore.QLineF(self.graphPoint, nextPoint), pen = self.gPathPen)
+    line.setLine(-line.line().dx(), line.line().y1(), 0, line.line().y2())
+    self.lineGroup.moveBy(-line.line().dx(), 0)
+    self.lineGroup.addToGroup(line)
+    
+    self.graphPoint = nextPoint
+
+
+    self.linesList.append(line)
+
+    self.linesList = self.removeLine(self.linesList)
+
+    gPoint.scaleY([0, 2], [0, 1])
+    gPoint.scaleX([0, 2], [0, 1])
+
+    self.gLine.setLine(0, gPoint.y, gPoint.x, gPoint.y)
+    self.oLine.setLine(0, 0, gPoint.x, gPoint.y)
+    self.fText.setText(str(gPoint))
+  def drawFPath(self, FPath):
+    pass
   def setSelected(self, index):
     self.selected = index
-
+    
   def drawCircles(self, newCirclesList):
       ncl = len(newCirclesList)
 
@@ -72,28 +100,6 @@ class Graphic(QtGui.QGraphicsView):
     else:
       self.graphScene.setSceneRect(-self.margin, -self.margin, self.rect().width(), self.margin * 2)
       self.yPath.setLine(0.0, -self.margin, 0.0, self.margin * 2)
-  def drawGPath(self, gPath, gPoint):
-    rate = 1000
-    gPath.scaleY([0, 2], [0, 1])
-    gPath.scaleX([0, 2], [0, 1000])
-    nextPoint = QtCore.QPointF(gPath.x, gPath.y)
-    line = self.graphScene.addLine(QtCore.QLineF(self.graphPoint, nextPoint), pen = self.gPathPen)
-    line.setLine(0.0, line.line().y1(), line.line().dx(), line.line().y2())
-    self.lineGroup.moveBy(-line.line().dx(), 0)
-    self.lineGroup.addToGroup(line)
-    self.graphPoint = nextPoint
-
-
-    self.linesList.append(line)
-
-    self.linesList = self.removeLine(self.linesList)
-
-    gPoint.scaleY([0, 2], [0, 1])
-    gPoint.scaleX([0, 2], [0, 1])
-
-    self.gLine.setLine(0, gPoint.y, gPoint.x, gPoint.y)
-    self.oLine.setLine(0, 0, gPoint.x, gPoint.y)
-    self.fText.setText(str(gPoint))
 
   def removeLine(self, lineArr):
     if(len(lineArr) == 0): 
