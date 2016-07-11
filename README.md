@@ -1,5 +1,6 @@
 # harmonic
- visualization of harmonic oscillations on python
+ visualization of harmonic oscillations on python.
+ created just for fun
 
 ## dependencies
  require Python3 and PyQt4
@@ -8,4 +9,3 @@
 ```
 $ python main.py
 ```
-### create Just For Fun
