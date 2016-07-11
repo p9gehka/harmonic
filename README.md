@@ -1,4 +1,4 @@
-# harmonic
+# Harmonic
  visualization of harmonic oscillations on python.
  created just for fun
 
