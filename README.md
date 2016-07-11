@@ -1,11 +1,11 @@
-## harmonic
+# harmonic
  visualization of harmonic oscillations on python
 
-# dependencies
+## dependencies
  require Python3 and PyQt4
 
-# run
+## run
 ```
 $ python main.py
 ```
-# create Just For Fun
+### create Just For Fun
